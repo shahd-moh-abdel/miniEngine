@@ -45,9 +45,13 @@ int main()
 
   GLfloat verts[] =
     {
-      +0.0f, +1.0f,
+      +0.0f, +0.0f,
+      +1.0f, +1.0f,
+      -1.0f, +1.0f,
+
+      +0.0f, +0.0f,
       -1.0f, -1.0f,
-      +1.0f, -1.0f
+      +1.0f, -1.0f,
     };
 
   GLuint myBufferId;
@@ -65,7 +69,7 @@ int main()
       glClearColor(0.4f, 0.3f, 0.8f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
 
-      glDrawArrays(GL_TRIANGLES, 0,  3);
+      glDrawArrays(GL_TRIANGLES, 0,  6);
 
       glfwSwapBuffers(window);
       glfwPollEvents();

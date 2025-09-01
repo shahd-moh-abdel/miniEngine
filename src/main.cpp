@@ -15,9 +15,9 @@ void processInput(GLFWwindow * window)
 
 GLFWwindow* windowSetUp() {
   glfwInit();
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   GLFWwindow* window = glfwCreateWindow(900, 600, "Mini Engine", NULL, NULL);
   if (!window)
@@ -42,12 +42,30 @@ GLFWwindow* windowSetUp() {
 int main()
 {
   GLFWwindow* window = windowSetUp();
+
+  GLfloat verts[] =
+    {
+      +0.0f, +1.0f,
+      -1.0f, -1.0f,
+      +1.0f, -1.0f
+    };
+
+  GLuint myBufferId;
+  glGenBuffers(1, &myBufferId);
+  glBindBuffer(GL_ARRAY_BUFFER, myBufferId);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW); 
+  glEnableVertexAttribArray(0);
+
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+  
   while (!glfwWindowShouldClose(window))
     {
       processInput(window);
 
       glClearColor(0.4f, 0.3f, 0.8f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
+
+      glDrawArrays(GL_TRIANGLES, 0,  3);
 
       glfwSwapBuffers(window);
       glfwPollEvents();

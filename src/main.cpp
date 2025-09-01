@@ -1,8 +1,11 @@
 #include <iostream>
 #include "../include/glad/glad.h"
 #include <GLFW/glfw3.h>
-#include <ostream>>
+
 using namespace std;
+
+#define SCREEN_WIDTH 900
+#define SCREEN_HEIGHT 600
 
 void processInput(GLFWwindow * window)
 {
@@ -10,8 +13,7 @@ void processInput(GLFWwindow * window)
     glfwSetWindowShouldClose(window, true);
 }
 
-int main()
-{
+GLFWwindow* windowSetUp() {
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -21,18 +23,25 @@ int main()
   if (!window)
     {
       cout << "Error creating the window " << endl;
-      return -1;
+      return nullptr;
     }
   glfwMakeContextCurrent(window);
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
       cout << "Glad error" << endl;
-      return -1;
+      return nullptr;
     }
 
   glViewport(0, 0, 900, 600);
 
+  return window;
+}
+
+
+int main()
+{
+  GLFWwindow* window = windowSetUp();
   while (!glfwWindowShouldClose(window))
     {
       processInput(window);

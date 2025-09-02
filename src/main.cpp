@@ -120,17 +120,27 @@ GLFWwindow* windowSetUp() {
 }
 
 void createVertexBuffer()
-{  
+{
+  const float RED_TRIANGLE_Z = -0.5f; // closer to the camera
+  const float BLUE_TRIANGLE_Z = -1.0f;
+  
   GLfloat verts[] =
     {
       // #1 triangle 0, 1, 2
-      // #2 triangle 0, 3, 4
-      +0.0f, -1.0f, // 0
+      // #2 triangle 3, 4, 5
+      +0.0f, -1.0f, RED_TRIANGLE_Z, // 0
       +1.0f, +0.0f, +0.0f, // color / RED 
-      +1.0f, +1.0f, // 1
-      +0.0f, +1.0f, +0.0f, // color / GREEN
-      -1.0f, +1.0f, // 2 
+      +1.0f, +1.0f, RED_TRIANGLE_Z, // 1
+      +1.0f, +0.0f, +0.0f, // color / RED
+      -1.0f, +1.0f, RED_TRIANGLE_Z,// 2 
+      +1.0f, +0.0f, +0.0f, // color / RED
+      +0.0f, +1.0f, BLUE_TRIANGLE_Z, // 3
+      +0.0f, +0.0f, +1.0f, // BLUE
+      -1.0f, -1.0f, BLUE_TRIANGLE_Z, // 4
       +0.0f, +0.0f, +1.0f, // color / BLUE
+      +1.0f, -1.0f, BLUE_TRIANGLE_Z,// 5
+      +0.0f, +0.0f, +1.0f,
+      
     };
 
   GLuint myBufferId;
@@ -139,16 +149,17 @@ void createVertexBuffer()
   glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
 
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 0);
 
   glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (char*)(sizeof(float) * 2));
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (char*)(sizeof(float) * 3));
 }
 
 void createIndexBuffer()
 {
   GLushort indices[] = {
     0, 1, 2,
+    3, 4, 5
   };
   GLuint indexBufferID;
   glGenBuffers(1, &indexBufferID);
@@ -160,7 +171,8 @@ void createIndexBuffer()
 int main()
 {
   GLFWwindow* window = windowSetUp();
-
+  glEnable(GL_DEPTH_TEST);
+  
   createVertexBuffer();
   createIndexBuffer();
 
@@ -171,12 +183,13 @@ int main()
   while (!glfwWindowShouldClose(window))
     {
       processInput(window);
-
+      glClear(GL_DEPTH_BUFFER_BIT);
+      
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
 
       //glDrawArrays(GL_TRIANGLES, 0,  6);
-      glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+      glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
       glfwSwapBuffers(window);
       glfwPollEvents();
     }

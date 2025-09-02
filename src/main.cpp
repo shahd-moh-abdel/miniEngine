@@ -27,7 +27,12 @@ static unsigned int compileShader(unsigned int type, const string& source)
   glGetShaderiv(id, GL_COMPILE_STATUS, &result);
   if (result == GL_FALSE)
     {
-      cout << "ERROR: error in compiling shaders" << endl;
+      int length;
+      glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+      char* message = (char*)alloca(length * sizeof(char));
+      glGetShaderInfoLog(id, length, &length, message);
+      cout << "ERROR: error in "<< type << " Shader: " << message << endl;
+      glDeleteShader(id);
       return 0;
     }
 
@@ -133,16 +138,22 @@ int main()
   std::string vertexShader =
     "#version 430 \n"
     "layout(location = 0) in vec4 position;"
+    "layout(location = 1) in vec3 vertexColor;"
+    ""
+    "out vec3 theColor;"
+    ""
     "void main()\n"
     "{\n"
     " gl_Position = position;\n"
+    " theColor = vertexColor;"
     "}\n";
   std::string fragShader =
     "#version 430\n"
     "out vec4 color;"
+    "in vec3 theColor;"
     "void main()\n"
     "{\n"
-    " color = vec4(0.9, 0.7, 1.0, 1.0);\n"
+    " color = vec4(theColor, 1.0);\n"
     "}\n";
 
   unsigned int shader = createShader(vertexShader, fragShader);

@@ -13,6 +13,47 @@ void processInput(GLFWwindow * window)
     glfwSetWindowShouldClose(window, true);
 }
 
+//Compile Shaders from a file
+static unsigned int compileShader(unsigned int type, const string& source)
+{
+  GLuint id = glCreateShader(type);
+  const char* src = source.c_str();
+
+  glShaderSource(id, 1, &src, nullptr);
+  glCompileShader(id);
+
+  //error handling 
+  int result;
+  glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+  if (result == GL_FALSE)
+    {
+      cout << "ERROR: error in compiling shaders" << endl;
+      return 0;
+    }
+
+  return id;
+}
+
+//Creating Shaders 
+static unsigned int createShader(const string& vertexShader, const string& fragmentShader)
+{
+  GLuint program = glCreateProgram();
+
+  GLuint vs = compileShader(GL_VERTEX_SHADER, vertexShader);
+  GLuint fs = compileShader(GL_FRAGMENT_SHADER, fragmentShader);
+
+  glAttachShader(program, vs);
+  glAttachShader(program, fs);
+
+  glLinkProgram(program);
+  glValidateProgram(program);
+
+  glDeleteShader(vs);
+  glDeleteShader(fs);
+
+  return program;
+}
+
 GLFWwindow* windowSetUp() {
   glfwInit();
   //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -87,6 +128,25 @@ int main()
 
   createVertexBuffer();
   createIndexBuffer();
+
+  //text shaders for a test 
+  std::string vertexShader =
+    "#version 430 \n"
+    "layout(location = 0) in vec4 position;"
+    "void main()\n"
+    "{\n"
+    " gl_Position = position;\n"
+    "}\n";
+  std::string fragShader =
+    "#version 430\n"
+    "out vec4 color;"
+    "void main()\n"
+    "{\n"
+    " color = vec4(0.9, 0.7, 1.0, 1.0);\n"
+    "}\n";
+
+  unsigned int shader = createShader(vertexShader, fragShader);
+  glUseProgram(shader);
   
   while (!glfwWindowShouldClose(window))
     {

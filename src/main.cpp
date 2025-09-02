@@ -1,6 +1,8 @@
 #include <iostream>
 #include "../include/glad/glad.h"
 #include <GLFW/glfw3.h>
+#include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -11,6 +13,42 @@ void processInput(GLFWwindow * window)
 {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
+}
+
+struct shaderProgramSource
+{
+  string vertexShader;
+  string fragmentShader;
+};
+
+static shaderProgramSource parseShaders(const string& filePath)
+{
+  ifstream stream(filePath);
+
+  enum class ShaderType
+    {
+      NONE = 0, VERTEX = 0, FRAGMENT = 1
+    };
+
+    string line;
+    stringstream ss[2];
+    ShaderType type = ShaderType::NONE;
+
+    while (getline(stream, line))
+      {
+	if (line.find("#shader") != string::npos)
+	  {
+	    if (line.find("vertex") != string::npos)
+	      type = ShaderType::VERTEX;
+	    else if (line.find("fragment") != string::npos)
+	      type = ShaderType::FRAGMENT;
+	  }
+	else
+	  ss[(int)type] << line << '\n';
+      }
+
+    return {ss[0].str(), ss[1].str()};
+    
 }
 
 //Compile Shaders from a file
@@ -61,10 +99,7 @@ static unsigned int createShader(const string& vertexShader, const string& fragm
 
 GLFWwindow* windowSetUp() {
   glfwInit();
-  //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
+  
   GLFWwindow* window = glfwCreateWindow(900, 600, "Mini Engine", NULL, NULL);
   if (!window)
     {
@@ -90,16 +125,12 @@ void createVertexBuffer()
     {
       // #1 triangle 0, 1, 2
       // #2 triangle 0, 3, 4
-      +0.0f, +0.0f, // 0
-      +1.0f, +0.0f, +1.0f, // color 
+      +0.0f, -1.0f, // 0
+      +1.0f, +0.0f, +0.0f, // color / RED 
       +1.0f, +1.0f, // 1
-      +1.0f, +0.0f, +0.0f, // color
+      +0.0f, +1.0f, +0.0f, // color / GREEN
       -1.0f, +1.0f, // 2 
-      +1.0f, +0.0f, +0.0f, // color
-      -1.0f, -1.0f, // 3
-      +1.0f, +0.0f, +0.0f, // color
-      +1.0f, -1.0f, // 4
-      +1.0f, +0.0f, +0.0f, // color
+      +0.0f, +0.0f, +1.0f, // color / BLUE
     };
 
   GLuint myBufferId;
@@ -118,7 +149,6 @@ void createIndexBuffer()
 {
   GLushort indices[] = {
     0, 1, 2,
-    0, 3, 4
   };
   GLuint indexBufferID;
   glGenBuffers(1, &indexBufferID);
@@ -134,40 +164,19 @@ int main()
   createVertexBuffer();
   createIndexBuffer();
 
-  //text shaders for a test 
-  std::string vertexShader =
-    "#version 430 \n"
-    "layout(location = 0) in vec4 position;"
-    "layout(location = 1) in vec3 vertexColor;"
-    ""
-    "out vec3 theColor;"
-    ""
-    "void main()\n"
-    "{\n"
-    " gl_Position = position;\n"
-    " theColor = vertexColor;"
-    "}\n";
-  std::string fragShader =
-    "#version 430\n"
-    "out vec4 color;"
-    "in vec3 theColor;"
-    "void main()\n"
-    "{\n"
-    " color = vec4(theColor, 1.0);\n"
-    "}\n";
-
-  unsigned int shader = createShader(vertexShader, fragShader);
+  shaderProgramSource source = parseShaders("res/shaders/shaders.glsl");
+  unsigned int shader = createShader(source.vertexShader, source.fragmentShader);
   glUseProgram(shader);
   
   while (!glfwWindowShouldClose(window))
     {
       processInput(window);
 
-      glClearColor(0.4f, 0.3f, 0.8f, 1.0f);
+      glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
 
       //glDrawArrays(GL_TRIANGLES, 0,  6);
-      glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+      glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
       glfwSwapBuffers(window);
       glfwPollEvents();
     }

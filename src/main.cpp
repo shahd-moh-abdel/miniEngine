@@ -121,14 +121,14 @@ GLFWwindow* windowSetUp() {
 
 void createVertexBuffer()
 {
-  const float RED_TRIANGLE_Z = -0.5f; // closer to the camera
-  const float BLUE_TRIANGLE_Z = -1.0f;
-  
+  const float RED_TRIANGLE_Z = 0.5f; // closer to the camera
+  const float BLUE_TRIANGLE_Z = -0.5f;
+
   GLfloat verts[] =
     {
       // #1 triangle 0, 1, 2
       // #2 triangle 3, 4, 5
-      +0.0f, -1.0f, RED_TRIANGLE_Z, // 0
+      +0.0f, -1.0f, -2.0f * RED_TRIANGLE_Z, // 0
       +1.0f, +0.0f, +0.0f, // color / RED 
       +1.0f, +1.0f, RED_TRIANGLE_Z, // 1
       +1.0f, +0.0f, +0.0f, // color / RED

@@ -124,8 +124,8 @@ float DELTA = 0.1f;
 int triangleNum = 0;
 const uint NUM_VERT_PER_TRI = 3;
 const uint NUM_FLOAT_PER_VERT = 6;
-const uint TRIANGLE_BYTE_SIZE = sizeof(float) * NUM_FLOAT_PER_VERT;
-const uint MAX_TRIANGLES = 2;
+const uint TRIANGLE_BYTE_SIZE = sizeof(float) * NUM_FLOAT_PER_VERT * NUM_VERT_PER_TRI;
+const uint MAX_TRIANGLES = 20;
 
 void createVertexBuffer()
 {
@@ -152,8 +152,8 @@ void drawAnotherTriangle()
     THIS_TRIANGL_X + DELTA, 1.0f, 0.0f,
     1.0f, 0.0f, 0.0f,
 
-    THIS_TRIANGL_X , 0.0f, 0.0f,
-    -1.0f, 0.0f, 0.0f,
+    THIS_TRIANGL_X , -1.0f, 0.0f,
+    1.0f, 0.0f, 0.0f,
   };
 
   glBufferSubData(GL_ARRAY_BUFFER, triangleNum * TRIANGLE_BYTE_SIZE, TRIANGLE_BYTE_SIZE, tri);

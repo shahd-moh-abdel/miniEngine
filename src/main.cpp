@@ -152,7 +152,7 @@ void drawAnotherTriangle()
     THIS_TRIANGL_X + DELTA, 1.0f, 0.0f,
     1.0f, 0.0f, 0.0f,
 
-    THIS_TRIANGL_X , -1.0f, 0.0f,
+    THIS_TRIANGL_X , 0.0f, 0.0f,
     1.0f, 0.0f, 0.0f,
   };
 
@@ -190,4 +190,3 @@ int main()
   
   return 0;
 }
-

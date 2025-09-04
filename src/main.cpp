@@ -1,6 +1,7 @@
 #include <iostream>
 #include "../include/glad/glad.h"
 #include <GLFW/glfw3.h>
+#include "../include/glm/glm.hpp"
 #include <fstream>
 #include <sstream>
 
@@ -127,12 +128,28 @@ const uint NUM_FLOAT_PER_VERT = 6;
 const uint TRIANGLE_BYTE_SIZE = sizeof(float) * NUM_FLOAT_PER_VERT * NUM_VERT_PER_TRI;
 const uint MAX_TRIANGLES = 20;
 
+struct Vertex {
+  glm::vec3 position;
+  glm::vec3 color;
+};
+
 void createVertexBuffer()
 {
+  Vertex myTri[] = {
+    glm::vec3(+0.0f, +1.0f, +0.0f),//pos
+    glm::vec3(+0.0f, +1.0f, +0.0f),//color
+
+    glm::vec3(-1.0f, -1.0f, +0.0f),//pos
+    glm::vec3(+0.0f, +1.0f, +0.0f),//color
+
+    glm::vec3(+1.0f, -1.0f, +0.0f),//pos
+    glm::vec3(+0.0f, +1.0f, +0.0f),//color
+  };
+  
   GLuint myBufferId;
   glGenBuffers(1, &myBufferId);
   glBindBuffer(GL_ARRAY_BUFFER, myBufferId);
-  glBufferData(GL_ARRAY_BUFFER, MAX_TRIANGLES * TRIANGLE_BYTE_SIZE, NULL, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(myTri), myTri, GL_STATIC_DRAW);
 
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 0);
@@ -180,8 +197,8 @@ int main()
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
 
-      drawAnotherTriangle();
-      glDrawArrays(GL_TRIANGLES, 0, triangleNum * NUM_VERT_PER_TRI);
+      //drawAnotherTriangle();
+      glDrawArrays(GL_TRIANGLES, 0, 3);
       glfwSwapBuffers(window);
       glfwPollEvents();
     }

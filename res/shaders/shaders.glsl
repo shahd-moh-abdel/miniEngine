@@ -23,9 +23,16 @@ out vec4 fragColor;
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 uv = fragCoord/iResolution.xy;
-    vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx+vec3(0,2,4));
-    fragColor = vec4(col,1.0);
+    vec2 uv = fragCoord / iResolution.xy;
+
+    uv -= .5;
+    uv.x *= iResolution.x / iResolution.y;
+    float d = length(uv);
+    float col = d;
+
+    if ( d < .3 ) col = 1.; else col = 0.;
+    
+    fragColor = vec4(vec3(col),1.0);
 }
 
 void main()

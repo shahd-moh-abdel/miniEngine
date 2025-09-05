@@ -27,8 +27,16 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
     uv -= .5;
     uv.x *= iResolution.x / iResolution.y;
-        
-    fragColor = vec4(abs(sin(iTime)), 0., 0.,1.0);
+
+    float circleRad = 0.2;
+    float d = length(uv);
+    
+    vec3 circleColor = vec3(abs(sin(iTime)), 0.0, abs(cos(iTime)));
+    vec3 c = vec3(1.);
+    
+    if (d < circleRad) c = circleColor; else c = vec3(1.);
+    
+    fragColor = vec4(c,1.0);
 }
 
 void main()

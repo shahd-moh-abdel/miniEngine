@@ -115,67 +115,36 @@ GLFWwindow* windowSetUp() {
       return nullptr;
     }
 
-  glViewport(0, 0, 900, 600);
+  glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
   return window;
 }
 
-
-float DELTA = 0.1f;
-int triangleNum = 0;
-const uint NUM_VERT_PER_TRI = 3;
-const uint NUM_FLOAT_PER_VERT = 6;
-const uint TRIANGLE_BYTE_SIZE = sizeof(float) * NUM_FLOAT_PER_VERT * NUM_VERT_PER_TRI;
-const uint MAX_TRIANGLES = 20;
 
 struct Vertex {
   glm::vec3 position;
   glm::vec3 color;
 };
 
-void createVertexBuffer()
+void createFullScreen()
 {
-  Vertex myTri[] = {
-    glm::vec3(+0.0f, +1.0f, +0.0f),//pos
-    glm::vec3(+0.0f, +1.0f, +0.0f),//color
-
-    glm::vec3(-1.0f, -1.0f, +0.0f),//pos
-    glm::vec3(+0.0f, +1.0f, +0.0f),//color
-
-    glm::vec3(+1.0f, -1.0f, +0.0f),//pos
-    glm::vec3(+0.0f, +1.0f, +0.0f),//color
+  GLfloat vertices[] = {
+    -1.0f, -1.0f,
+    +1.0f, -1.0f,
+    -1.0f, +1.0f,
+    +1.0f, +1.0f
   };
-  
-  GLuint myBufferId;
-  glGenBuffers(1, &myBufferId);
-  glBindBuffer(GL_ARRAY_BUFFER, myBufferId);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(myTri), myTri, GL_STATIC_DRAW);
+
+  GLuint VBO, VAO;
+  glGenVertexArrays(1, &VAO);
+  glGenBuffers(1, &VBO);
+
+  glBindVertexArray(VAO);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 0);
-
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (char*)(sizeof(float) * 3));
-}
-
-void drawAnotherTriangle()
-{
-  if (triangleNum == MAX_TRIANGLES) return;
-  const float THIS_TRIANGL_X = -1 + triangleNum * DELTA;
-  GLfloat tri[] = {
-    THIS_TRIANGL_X , 1.0f, 0.0f,
-    1.0f, 0.0f, 0.0f,
-    
-    THIS_TRIANGL_X + DELTA, 1.0f, 0.0f,
-    1.0f, 0.0f, 0.0f,
-
-    THIS_TRIANGL_X , 0.0f, 0.0f,
-    1.0f, 0.0f, 0.0f,
-  };
-
-  glBufferSubData(GL_ARRAY_BUFFER, triangleNum * TRIANGLE_BYTE_SIZE, TRIANGLE_BYTE_SIZE, tri);
-
-  triangleNum++;  
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
 }
 
 int main()
@@ -183,11 +152,17 @@ int main()
   GLFWwindow* window = windowSetUp();
   glEnable(GL_DEPTH_TEST);
   
-  createVertexBuffer();
+  createFullScreen();
 
   shaderProgramSource source = parseShaders("res/shaders/shaders.glsl");
   unsigned int shader = createShader(source.vertexShader, source.fragmentShader);
   glUseProgram(shader);
+
+  int iResLoc = glGetUniformLocation(shader, "iResolution");
+  int iTimeLoc = glGetUniformLocation(shader, "iTime");
+  int iMouseLoc = glGetUniformLocation(shader, "iMouse");
+
+  double startTime = glfwGetTime();
   
   while (!glfwWindowShouldClose(window))
     {
@@ -197,8 +172,24 @@ int main()
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
 
-      //drawAnotherTriangle();
-      glDrawArrays(GL_TRIANGLES, 0, 3);
+      float currentTime = glfwGetTime() - startTime;
+      if (iTimeLoc != -1)
+	glUniform1f(iTimeLoc, currentTime);
+
+      if (iResLoc != -1)
+	glUniform3f(iResLoc, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f);
+
+      //get mouse pos
+      if (iMouseLoc != -1)
+	{
+	  double mouseX, mouseY;
+	  glfwGetCursorPos(window, &mouseX, &mouseY);
+	  mouseY =  SCREEN_HEIGHT - mouseY;
+	  glUniform4f(iMouseLoc, mouseX, mouseY, 0.0f, 0.0f);
+	}
+      
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+      
       glfwSwapBuffers(window);
       glfwPollEvents();
     }

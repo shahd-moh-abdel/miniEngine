@@ -15,9 +15,20 @@ void main()
 #shader fragmentShader
 #version 430
 
-out vec4 a_color;
-in vec3 theColor;
+uniform vec3 iResolution;
+uniform float iTime;
+uniform vec4 iMouse;     
+out vec4 fragColor;
+
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord/iResolution.xy;
+    vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx+vec3(0,2,4));
+    fragColor = vec4(col,1.0);
+}
+
 void main()
 {
-  a_color = vec4(theColor, 1.0); //RGBA
+   mainImage(fragColor, gl_FragCoord.xy);
 }

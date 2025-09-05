@@ -7,7 +7,7 @@
 
 using namespace std;
 
-#define SCREEN_WIDTH 900
+#define SCREEN_WIDTH 600
 #define SCREEN_HEIGHT 600
 
 void processInput(GLFWwindow * window)
@@ -101,7 +101,7 @@ static unsigned int createShader(const string& vertexShader, const string& fragm
 GLFWwindow* windowSetUp() {
   glfwInit();
   
-  GLFWwindow* window = glfwCreateWindow(900, 600, "Mini Engine", NULL, NULL);
+  GLFWwindow* window = glfwCreateWindow(600, 600, "Mini Engine", NULL, NULL);
   if (!window)
     {
       cout << "Error creating the window " << endl;

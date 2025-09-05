@@ -20,21 +20,30 @@ uniform float iTime;
 uniform vec4 iMouse;     
 out vec4 fragColor;
 
+float plot(vec2 uv)
+{
+  return smoothstep(0.02, 0.0, abs(uv.y - uv.x));
+}
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
     vec2 uv = fragCoord / iResolution.xy;
-
+    float mp = iMouse.x / iResolution.x;
+    
     uv -= .5;
     uv.x *= iResolution.x / iResolution.y;
 
     float circleRad = 0.2;
     float d = length(uv);
     
-    vec3 circleColor = vec3(abs(sin(iTime)), 0.0, abs(cos(iTime)));
+    vec3 circleColor = vec3(abs(sin(iTime)), abs(sin(mp)), abs(cos(iTime)));
     vec3 c = vec3(1.);
     
     if (d < circleRad) c = circleColor; else c = vec3(1.);
+
+    // plot a line
+    float pct = plot(uv);
+    c = (1.0-pct)*c+pct*vec3(0.0,1.0,0.0);
     
     fragColor = vec4(c,1.0);
 }

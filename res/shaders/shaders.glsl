@@ -21,36 +21,19 @@ uniform float iTime;
 uniform vec4 iMouse;     
 out vec4 fragColor;
 
-float plot(vec2 uv, float pct)
-{
-  return smoothstep(pct-0.02, pct, uv.y) -
-    smoothstep(pct, pct+0.02, uv.y);
-}
-
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 uv = fragCoord / iResolution.xy;
-    float mp = iMouse.x / iResolution.x;
+  //normalize
+  vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.xy;
 
-    //float y = pow(uv.x, 5.0);
-    //float y = log(uv.x * PI);
-    
-    //uv -= .5;
-    //uv.x *= iResolution.x / iResolution.y;
+  float angle = atan(uv.y, uv.x);
+  float rad = length(uv);
 
-    float circleRad = 0.2;
-    float d = length(uv);
+  float spiral = angle + rad * 3.0;
+  float pattern = sin(spiral * 4.0) * 0.5 + 0.5;
     
-    vec3 circleColor = vec3(abs(sin(iTime)), abs(sin(mp)), abs(cos(iTime)));
-    vec3 c = vec3(1.);
-    
-    if (d < circleRad) c = circleColor; else c = vec3(y, 0.0, 0.0);
-
-    // plot a line
-    float pct = plot(uv, y);
-    c = (1.0-pct)*c+pct*vec3(0.0,1.0,0.0);
-    
-    fragColor = vec4(c,1.0);
+  vec3 color = mix(vec3(0.1, 0.0, 0.4), vec3(0.8, 0.2, 0.8), pattern);  
+  fragColor = vec4(color,1.0);
 }
 
 void main()

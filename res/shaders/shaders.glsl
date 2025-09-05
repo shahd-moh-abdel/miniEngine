@@ -26,13 +26,21 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
   //normalize
   vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.xy;
 
+  float t = iTime * 0.8;
+  
   float angle = atan(uv.y, uv.x);
   float rad = length(uv);
 
   float spiral = angle + rad * 3.0;
   float pattern = sin(spiral * 4.0) * 0.5 + 0.5;
-    
-  vec3 color = mix(vec3(0.1, 0.0, 0.4), vec3(0.8, 0.2, 0.8), pattern);  
+
+  float pulse = sin(t * 2.0) * 0.2 + 0.8;
+  pattern *= pulse;
+
+  vec3 color1 = vec3(0.1, 0.0, 0.4);
+  vec3 color2 = vec3(0.8, 0.2, 0.8);
+  
+  vec3 color = mix(color1, color2, pattern);  
   fragColor = vec4(color,1.0);
 }
 

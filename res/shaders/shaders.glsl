@@ -27,12 +27,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
     uv -= .5;
     uv.x *= iResolution.x / iResolution.y;
-    float d = length(uv);
-    float col = d;
-
-    if ( d < .3 ) col = 1.; else col = 0.;
-    
-    fragColor = vec4(vec3(col),1.0);
+        
+    fragColor = vec4(abs(sin(iTime)), 0., 0.,1.0);
 }
 
 void main()

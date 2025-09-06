@@ -21,6 +21,28 @@ uniform float iTime;
 uniform vec4 iMouse;     
 out vec4 fragColor;
 
+//noise function
+float noise(vec2 p)
+{
+  return sin(p.x) * sin(p.y);
+}
+
+// fractal noise
+float fbm (vec2 p)
+{
+  float value = 0.0;
+  float amplitude = 0.5;
+
+  for (int i = 0; i < 4; i++)
+    {
+      value += amplitude * noise(p);
+      p *= 2.0;
+      amplitude *= 0.5;
+    }
+
+  return value;
+}
+
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
   //normalize
@@ -34,14 +56,22 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
   float angle = atan(uv.y, uv.x);
   float rad = length(uv);
 
+  float noiseDistro = fbm(uv * 2.0 + t * 0.5) * 0.5;
+  angle += noiseDistro;
+
   float mouseInfluence = 1.0 / (length(uv - mouse * 0.8) + 0.1);
 
-  float spiral = angle + rad * 3.0 + t + mouseInfluence * 0.4;
+  float spiral = angle + rad * 3.0 + t + mouseInfluence * 0.3;
   float spiralPattern = sin(spiral * 4.0) * 0.5 + 0.5;
-
+  
   float rings = sin(rad * 15.0 - t * 3.0) * 0.5 + 0.5;
   rings *= smoothstep(0.0, 0.1, rad) * smoothstep(1.0, 0.6, rad);
-  float combined = spiralPattern * 0.7 + rings * 0.6;
+
+  float trubulence = fbm(uv * 3 + t * 0.3);
+  trubulence = (trubulence + 1.0) * 0.5;
+  
+  float combined = spiralPattern * 0.6 + rings * 0.7 + trubulence * 0.3;
+  combined = smoothstep(0.0, 1.2, combined);
   
   float pulse = sin(t * 2.0) * 0.2 + 0.8;
   spiralPattern *= pulse;
@@ -49,9 +79,11 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
   vec3 color1 = vec3(0.1, 0.0, 0.4);
   vec3 color2 = vec3(0.8, 0.2, 0.8);
   vec3 color3 = vec3(0.2, 0.6, 1.0);
+  vec3 color4 = vec3(1.0, 0.8, 0.2);
   
   vec3 color = mix(color1, color2, spiralPattern);
-  color = mix(color, color3, rings * 0.4);
+  color = mix(color, color3, rings * 0.9);
+  color = mix(color, color4, smoothstep(0.7, 1.0, combined));
 
   float shimmer = sin(length(uv - mouse) * 20 + t * 6.0) * 0.1 + 0.9;
   color *= shimmer;
